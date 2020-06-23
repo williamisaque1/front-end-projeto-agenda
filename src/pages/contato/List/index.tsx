@@ -51,6 +51,8 @@ const ListaContatos: React.FC = () => { // que tipo cont vai ser (typescript) qu
         const response = await api.delete(`/contato/${id}`);
         if (response.data.message === "excluido") {
             alert(`contato excluido ${nome}`);
+            window.location.reload();
+
         } else {
             alert('erro ao excluir o contato');
         }

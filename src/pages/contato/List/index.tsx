@@ -38,7 +38,7 @@ const ListaContatos: React.FC = () => { // que tipo cont vai ser (typescript) qu
         });
         if(response.data.message === "cadastrado"){
             alert(`contato adicionado  ${nome}`);
-            window.location.reload(true);
+            window.location.reload();
         }else{
             alert("erro ao adicionar contato");
         }

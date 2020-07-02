@@ -20,6 +20,7 @@ body,
 input,
 button {
   font-family: Roboto, Arial, Helvetica, sans-serif;
+  
 }
 
 h1,
@@ -200,7 +201,8 @@ h6 {
 }
 
 #page-create-point form button:hover {
-  background: #2fb86e;
+  background: #b82f2f;
+  font-size: 23px;
 }
 
 .items-grid {

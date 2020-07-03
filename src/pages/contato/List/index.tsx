@@ -1,5 +1,6 @@
 import React, { useState, useEffect, FormEvent } from "react"; //use state conceito de imutabilidade
 import api from "../../../services/api" //useeffect podemos agendar quando uma funcao seja executada
+import { prependOnceListener } from "process";
 
 interface ContatoProps {
     id: number
@@ -52,6 +53,8 @@ const ListaContatos: React.FC = () => { // que tipo cont vai ser (typescript) qu
         if (response.data.message === "excluido") {
             alert(`contato excluido ${nome}`);
             window.location.reload();
+            
+            
 
         } else {
             alert('erro ao excluir o contato');
@@ -106,6 +109,8 @@ const ListaContatos: React.FC = () => { // que tipo cont vai ser (typescript) qu
                 ) : (<div>
                     <br />
                     <br />
+                    <div className = "spinner"> </div>
+                    <br/>
                     <p>carregando ...</p>
                 </div>)
                 }

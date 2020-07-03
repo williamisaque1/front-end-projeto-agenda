@@ -201,7 +201,9 @@ h6 {
 }
 
 #page-create-point form button:hover {
+  
   background: #b82f2f;
+
   font-size: 23px;
 }
 
@@ -244,4 +246,16 @@ h6 {
 }
 td > button{
   max-width:80px;
+}
+#page-create-point form  div.spinner  {
+  border:8px solid rgba(0,0,0,.1);
+  border-left-color: #22a6b3;
+height: 50px;
+width: 50px;
+border-radius: 50%;
+animation: spin 1s linear  infinite  ;
+}
+@keyframes spin{
+  to {transform: rotate(360deg);}
+
 }

@@ -1,6 +1,8 @@
-import React, { useState, useEffect, FormEvent } from "react"; //use state conceito de imutabilidade
+import React, { useState, useEffect, FormEvent, ChangeEvent } from "react"; //use state conceito de imutabilidade
 import api from "../../../services/api" //useeffect podemos agendar quando uma funcao seja executada
-import { prependOnceListener } from "process";
+import { unwatchFile } from "fs";
+import Local from "../../local/list";
+
 
 interface ContatoProps {
     id: number
@@ -10,51 +12,69 @@ interface ContatoProps {
     idlocal: number
     idtipocontato: number
 
+}
+interface idslocaisProps {
+    id: number,
+    endereco: string,
+    cidade:string,
+    bairro: string,
+    estado: string
 }  //funcionalidade typescript interface para saber as propriedades do retorno da api
 const ListaContatos: React.FC = () => { // que tipo cont vai ser (typescript) quando tem
     // html com javascript  o tipo react.fc fc = functioncomponent e um componente do react que esta representado como uma funcao
     // um jeito dentro usestage colocar do lado vetor 'AS nome da interface '
     const [loading, setloading] = useState(true); // true pagina vai comecar carregando, so vai ser falso quando terminar aa requisicao
     const [contatos, setContatos] = useState<ContatoProps[]>([]) //dessetrurizacao por [] //baixair o axios
-   const [nome,setnome] = useState ('');
-   const [email,setemail] = useState ('');
-   const [telefone,settelefone] = useState ('');
-   const [idtipocontato,setIdtipocontato] = useState (0);
-   const [idlocal,setIdlocal] = useState (0);
-   
+    const [nome, setnome] = useState('');
+    const [email, setemail] = useState('');
+    const [telefone, settelefone] = useState('');
+    const [idtipocontato, setIdtipocontato] = useState(0);
+    const [idlocal, setIdlocal] = useState(0);
+    const [locais, setLocais] = useState<idslocaisProps []> ([])
+
     //criando um vetor vazio , que vai ter esse tipo contatoprops , que vai ser um vetor de objetos
     async function getcontatos() {
         const response = await api.get<ContatoProps[]>("/contato")//vai ter essa interface , passar por parametro<> essa e uma funcionalidade javascript
         setContatos(response.data);
         setloading(false);
     }
-    async function insertContatos(e:FormEvent){
+    async function insertContatos(e: FormEvent) {
         e.preventDefault();
-        const response = await api.post("/contato",{
-         nome,
-         email,
-         telefone,
-         idlocal,
-         idtipocontato
+        const response = await api.post("/contato", {
+            nome,
+            email,
+            telefone,
+            idlocal,
+            idtipocontato
         });
-        if(response.data.message === "cadastrado"){
+        if (response.data.message === "cadastrado") {
             alert(`contato adicionado  ${nome}`);
             window.location.reload();
-        }else{
+        } else {
             alert("erro ao adicionar contato");
         }
 
     }
 
+
+        async function getLocais() {
+            const response = await api.get("/local");
+            setLocais(response.data);
+          }
+
+
+
+
+
     async function deletecontato(e: FormEvent, id: number, nome: string) {
         e.preventDefault();
-  
+
         const response = await api.delete(`/contato/${id}`);
         if (response.data.message === "excluido") {
             alert(`contato excluido ${nome}`);
             window.location.reload();
-            
-            
+
+
 
         } else {
             alert('erro ao excluir o contato');
@@ -62,8 +82,10 @@ const ListaContatos: React.FC = () => { // que tipo cont vai ser (typescript) qu
     }
     useEffect(() => {
         getcontatos();
+        getLocais();
+
         //useeffect nao pode ser assincrono, para ter uma funcao assincrona faz a funcao assincronaseparada
-    }, []) //coloca o [] coloca as variaveis que cada vez que for modificado a funcao sera rodada novamente
+    }, [idlocal]) //coloca o [] coloca as variaveis que cada vez que for modificado a funcao sera rodada novamente
     return (
         <div id="page-create-point" >
             <form>
@@ -93,6 +115,9 @@ const ListaContatos: React.FC = () => { // que tipo cont vai ser (typescript) qu
                                             <td>{contatc.email}</td>
                                             <td>{contatc.telefone}</td>
                                             <td> {contatc.idlocal}</td>
+                                            <th>{locais.map((locall)=> (
+                        contatc.idlocal === locall.id ? (`${locall.endereco},   ${locall.cidade} / ${locall.estado}`) : null
+                      ))}</th>
                                             <td>{contatc.idtipocontato}</td>
                                             <td>   <button onClick={(e) => deletecontato(e, contatc.id, contatc.nome)}> apagar </button> </td>
 
@@ -109,8 +134,8 @@ const ListaContatos: React.FC = () => { // que tipo cont vai ser (typescript) qu
                 ) : (<div>
                     <br />
                     <br />
-                    <div className = "spinner"> </div>
-                    <br/>
+                    <div className="spinner"> </div>
+                    <br />
                     <p>carregando ...</p>
                 </div>)
                 }
@@ -124,35 +149,48 @@ const ListaContatos: React.FC = () => { // que tipo cont vai ser (typescript) qu
                 <div className="field-group">
                     <div className="field">
                         <label htmlFor="Nome"> Nome </label>
-                        <input onChange = {(text) => setnome(text.currentTarget.value)} type="text" name="Nome" id="Nome" />
+                        <input onChange={(text) => setnome(text.currentTarget.value)} type="text" name="Nome" id="Nome" />
 
                     </div>
                     <div className="field">
                         <label htmlFor="email"> email </label>
-                        <input onChange = {(text) => setemail(text.currentTarget.value)} type="text" name="E-mail" id="email" />
+                        <input onChange={(text) => setemail(text.currentTarget.value)} type="text" name="E-mail" id="email" />
 
                     </div>
                 </div>
                 <div className="field-group">
                     <div className="field">
                         <label htmlFor="telefone"> Telefone </label>
-                        <input  onChange = {(text) => settelefone(text.currentTarget.value)} type="text" name="telefone" id="telefone" />
+                        <input onChange={(text) => settelefone(text.currentTarget.value)} type="text" name="telefone" id="telefone" />
 
                     </div>
                     <div className="field">
                         <label htmlFor="idtipocontato"> id Tipo contato</label>
-                        <input  onChange = {(text) => setIdtipocontato(Number(text.currentTarget.value))} type="text" name="idtipocontato" id="idtipocontato" />
+                        <input onChange={(text) => setIdtipocontato(Number(text.currentTarget.value))} type="text" name="idtipocontato" id="idtipocontato" />
 
                     </div>
                 </div>
                 <div className="field-group">
                     <div className="field">
                         <label htmlFor="idlocal"> Id local </label>
-                        <input  onChange = {(text) => setIdlocal(Number(text.currentTarget.value))} type="text" name="id local" id="tid local" />
+                        <select defaultValue="DEFAULT" onChange={(text) => setIdlocal(Number(text.currentTarget.value.trim()))} name="idlocal" id="idlocal">
+                            <option key="DEFAULT" value="nulo">-- Escolha um local --</option>
+                            {locais.map((ids) =>
+
+                                <option key={ids.id} value={1}>
+                                    {console.log( 'conteudo' + ids.cidade )}
+                                    {ids.endereco}, {ids.bairro} / {ids.estado}
+
+                                    {console.log("conteudoss " + ids.id)}
+                                </option>)
+
+                            });
+
+                        </select>
 
                     </div>
-                    </div>
-<button onClick = {(e) => insertContatos(e)} > Cadastrar</button>
+                </div>
+                <button onClick={(e) => insertContatos(e)} > Cadastrar</button>
             </form>
         </div>
 

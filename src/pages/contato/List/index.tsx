@@ -2,6 +2,8 @@ import React, { useState, useEffect, FormEvent, ChangeEvent } from "react"; //us
 import api from "../../../services/api" //useeffect podemos agendar quando uma funcao seja executada
 import { unwatchFile } from "fs";
 import Local from "../../local/list";
+import TipoContatos from "../../tipoContato/list";
+import { IoMdContact } from "react-icons/io";
 
 
 interface ContatoProps {
@@ -12,6 +14,10 @@ interface ContatoProps {
     idlocal: number
     idtipocontato: number
 
+}
+interface tipoContato{
+    id:number,
+    descricao: string
 }
 interface idslocaisProps {
     id: number,
@@ -31,6 +37,7 @@ const ListaContatos: React.FC = () => { // que tipo cont vai ser (typescript) qu
     const [idtipocontato, setIdtipocontato] = useState(0);
     const [idlocal, setIdlocal] = useState(0);
     const [locais, setLocais] = useState<idslocaisProps []> ([])
+    const [tipodoCont,settipodoCont] = useState <tipoContato []> ([])
 
     //criando um vetor vazio , que vai ter esse tipo contatoprops , que vai ser um vetor de objetos
     async function getcontatos() {
@@ -61,6 +68,12 @@ const ListaContatos: React.FC = () => { // que tipo cont vai ser (typescript) qu
             const response = await api.get("/local");
             setLocais(response.data);
           }
+          async function getidcontato() {
+              const response = await api.get("/tipocontato");
+              settipodoCont(response.data);
+          }
+
+    
 
 
 
@@ -83,6 +96,7 @@ const ListaContatos: React.FC = () => { // que tipo cont vai ser (typescript) qu
     useEffect(() => {
         getcontatos();
         getLocais();
+        getidcontato();
 
         //useeffect nao pode ser assincrono, para ter uma funcao assincrona faz a funcao assincronaseparada
     }, [idlocal]) //coloca o [] coloca as variaveis que cada vez que for modificado a funcao sera rodada novamente
@@ -114,11 +128,14 @@ const ListaContatos: React.FC = () => { // que tipo cont vai ser (typescript) qu
                                             <td>{contatc.nome}</td>
                                             <td>{contatc.email}</td>
                                             <td>{contatc.telefone}</td>
-                                            <td> {contatc.idlocal}</td>
-                                            <th>{locais.map((locall)=> (
+                                           
+                                            <td>{locais.map((locall)=> (
                         contatc.idlocal === locall.id ? (`${locall.endereco},   ${locall.cidade} / ${locall.estado}`) : null
-                      ))}</th>
-                                            <td>{contatc.idtipocontato}</td>
+                      ))}</td>
+                                            <td> {tipodoCont.map((idcont) => (  
+                                                contatc.idtipocontato === idcont.id  ? (idcont.descricao) : null
+                                             
+                                            ))}</td>
                                             <td>   <button onClick={(e) => deletecontato(e, contatc.id, contatc.nome)}> apagar </button> </td>
 
 
@@ -166,8 +183,14 @@ const ListaContatos: React.FC = () => { // que tipo cont vai ser (typescript) qu
                     </div>
                     <div className="field">
                         <label htmlFor="idtipocontato"> id Tipo contato</label>
-                        <input onChange={(text) => setIdtipocontato(Number(text.currentTarget.value))} type="text" name="idtipocontato" id="idtipocontato" />
-
+                        <select defaultValue = "DEFAULT " onChange={(text) => setIdtipocontato(Number(text.currentTarget.value))} name="idtipocontato" id="idtipocontato" >
+                        <option key = "DEFAULT" value = "nulo">-- escolha um tipo do contato </option>
+            {tipodoCont.map((tipoconts) => 
+             
+            <option key = {tipoconts.id} value = {tipoconts.id}>    {tipoconts.descricao}</option>)}
+         
+                       </select> 
+             
                     </div>
                 </div>
                 <div className="field-group">
@@ -177,11 +200,8 @@ const ListaContatos: React.FC = () => { // que tipo cont vai ser (typescript) qu
                             <option key="DEFAULT" value="nulo">-- Escolha um local --</option>
                             {locais.map((ids) =>
 
-                                <option key={ids.id} value={1}>
-                                    {console.log( 'conteudo' + ids.cidade )}
-                                    {ids.endereco}, {ids.bairro} / {ids.estado}
-
-                                    {console.log("conteudoss " + ids.id)}
+                                <option key={ids.id} value={ids.id}>
+                                    {ids.endereco},  bairro ({ids.bairro}) uf ({ids.estado})
                                 </option>)
 
                             });

@@ -56,13 +56,14 @@ const Local: React.FC = () => {
       "https://servicodados.ibge.gov.br/api/v1/localidades/estados"
     );
     setinf(response.data);
+    
   }
   async function getcity() {
-    console.log('vfv'+ uf)
-    const response = await Axios.get<uf[]>( 
+    console.log("vfv" + uf);
+    const response = await Axios.get<uf[]>(
       ` https://servicodados.ibge.gov.br/api/v1/localidades/estados/${uf}/distritos`
     );
-    console.log(response.data +'vfaav'+ uf)
+    console.log(response.data + "vfaav" + uf);
     setcity(response.data);
   }
 
@@ -70,8 +71,16 @@ const Local: React.FC = () => {
     getlocal();
     getinfo();
     getuf();
-    getcity();
   }, []);
+
+ 
+  useEffect(() => {
+    getcity()
+  },[uf])
+
+  
+
+
   return (
     <div id="page-create-point">
       <form>
@@ -121,7 +130,7 @@ const Local: React.FC = () => {
         )}
         <br />
         <br />
-        <br />
+        <br /> 
         <br />
         <h2> cadastrar </h2>
         <br />
@@ -173,40 +182,47 @@ const Local: React.FC = () => {
         <div className="field-group">
           <div className="field">
             <label htmlFor="cidade"> cidade </label>
-
+   {  
+   uf !== '' ? (
             <select
               name="cidade"
               id="cidade"
-              onChange={(text) => setLocalidade(text.currentTarget.value) }
-              {...getcity()}
+              onChange={(text) =>  setLocalidade(text.currentTarget.value)}
             >
               <option defaultValue="default" value="cidade">
-                 --Cidade
+                --Cidade
               </option>
               {city.map((cidades) => (
-                <option key="cidade" value={cidades.nome}>
-                  {cidades.nome} {console.log(uf + "" + cidades.nome )}
+                <option key="cidade" value={localidade}>
+                  {cidades.nome} {console.log(uf + "" + cidades.nome)}
                 </option>
               ))}
             </select>
+   ) : null
+              }
           </div>
 
           <div className="field">
             <label htmlFor="estado">estado</label>
             <select
               defaultValue="default"
-              onChange={(text) => setUf(text.currentTarget.value)}
+              onChange={(text ) =>  setUf(text.currentTarget.value)}
               name="estado"
               id="estado"
             >
               <option key="default" value="estado">
-                 
-                -- ESTADO{" "}
-              </option>
+                -- ESTADO
+              </option >
+
               {inf.map((ufinfo) => (
-                <option key={ufinfo.sigla} value={ufinfo.sigla}>
-                  {ufinfo.nome} {console.log(uf + 'gggg')}
+                
+                <option key={ufinfo.sigla} value={ufinfo.sigla} >
+                 
+                  {ufinfo.nome} {console.log(uf + "gggg")} 
+                  
+                
                 </option>
+                
               ))}
             </select>
           </div>

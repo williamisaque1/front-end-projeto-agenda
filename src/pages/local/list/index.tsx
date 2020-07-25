@@ -198,7 +198,15 @@ const Local: React.FC = () => {
                 </option>
               ))}
             </select>
-   ) : null
+   ) :   <div className="field-group">
+   <div className="field">
+   <select disabled >
+    <option defaultValue="default" value="cidade" >
+   --CIDADE
+ </option>
+ </select>
+ </div>
+ </div>
               }
           </div>
 
